@@ -11,7 +11,8 @@ from app.db.database import get_db
 
 
 router = APIRouter()
-
+def test():
+    pass
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user_by_username(db, username=user.username)
