@@ -77,6 +77,35 @@ def update_payout(
     db.refresh(payout)
     return payout
 
+def create_provider(db: Session, name: str):
+    provider = models.Provider(
+        name=name
+    )
+
+    db.add(provider)
+    db.commit()
+    db.refresh(provider)
+
+    return provider
+
+def create_placement(db: Session, placement_data: schemas.PlacementCreate):
+    provider = db.query(models.Provider).filter_by(id=placement_data.provider_id).first()
+
+    if not provider:
+        return None
+
+    placement = models.Placement(
+        country=placement_data.country,
+        imp_price_in_eur=placement_data.imp_price_in_eur,
+        provider=provider
+    )
+
+    db.add(placement)
+    db.commit()
+    db.refresh(placement)
+
+    return placement
+
 def get_placements(db):
     return db.query(models.Placement).options(
         joinedload(models.Placement.provider),

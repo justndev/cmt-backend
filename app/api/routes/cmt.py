@@ -113,3 +113,13 @@ def update_payout_amounts(
     if payout is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Payout not found")
     return payout
+
+@router.post("/providers", response_model=schemas.ProviderOut)
+def create_provider(provider: schemas.ProviderCreate, db: Session = Depends(get_db)):
+    provider = crud.create_provider(name=provider.name, db=db)
+    return provider
+
+@router.post("/placements", response_model=schemas.PlacementOut)
+def create_placement(placement: schemas.PlacementCreate, db: Session = Depends(get_db)):
+    placement = crud.create_placement(db=db, placement_data=placement)
+    return placement

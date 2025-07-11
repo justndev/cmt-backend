@@ -1,9 +1,11 @@
-from typing import List, Optional
+from typing import List
 from datetime import datetime
-from pydantic import BaseModel, constr, conint, HttpUrl
+from pydantic import BaseModel, constr, conint
 
 from app.schemas.user import UserResponse
 
+class ProviderCreate(BaseModel):
+    name: constr(min_length=1, max_length=255)
 
 class ProviderOut(BaseModel):
     id: int
@@ -12,6 +14,11 @@ class ProviderOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PlacementCreate(BaseModel):
+    country: constr(min_length=1, max_length=255)
+    imp_price_in_eur: conint(ge=0)
+    provider_id: int
 
 class PlacementOut(BaseModel):
     id: int
