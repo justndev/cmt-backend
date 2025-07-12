@@ -1,8 +1,6 @@
 from typing import Optional, List, Type
-
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
-
 from app.db import models
 from app.db.models import Campaign
 from app.schemas import schemas
@@ -18,6 +16,9 @@ def create_campaign(db: Session, user_id: int, campaign_data: schemas.CampaignCr
     placements = db.query(models.Placement).filter(
         models.Placement.id.in_(campaign_data.placement_ids)
     ).all()
+
+    if not placements:
+        return None
 
     campaign.placements = placements
     db.add(campaign)

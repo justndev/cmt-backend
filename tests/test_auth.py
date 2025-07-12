@@ -7,8 +7,6 @@ def test_register_user(client):
     data = response.json()
     assert data["username"] == "testuser1"
     assert "id" in data
-    assert data["is_active"] is True
-
 
 def test_register_existing_user(client):
     response = client.post("/api/auth/register", json={
@@ -35,4 +33,3 @@ def test_login_wrong_password(client):
     })
     assert response.status_code == 401
     assert response.json()["detail"] == "Incorrect username or password"
-

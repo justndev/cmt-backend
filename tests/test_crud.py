@@ -17,7 +17,6 @@ def test_create_placement(client):
     assert data["country"] == "Germany"
     assert data["imp_price_in_eur"] == 150
 
-
 def test_create_campaign(client):
     placement_response = client.get("/api/cmt/placements")
     assert placement_response.status_code == 200
@@ -45,7 +44,6 @@ def test_create_campaign(client):
     assert data["url"] == "http://example.com"
     assert len(data["placements"]) > 0
 
-
 def test_filter_campaigns(client):
     login_response = client.post("/api/auth/login", json={
         "username": "testuser1",
@@ -60,7 +58,6 @@ def test_filter_campaigns(client):
     assert response.status_code == 200
     campaigns = response.json()
     assert isinstance(campaigns, list)
-
 
 def test_toggle_campaign_status(client):
     login_response = client.post("/api/auth/login", json={
@@ -80,7 +77,6 @@ def test_toggle_campaign_status(client):
     })
     assert response.status_code == 200
     assert not response.json()["is_active"]
-
 
 def test_delete_campaign(client):
     login_response = client.post("/api/auth/login", json={

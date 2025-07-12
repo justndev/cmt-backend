@@ -1,8 +1,9 @@
-from typing import List
 from datetime import datetime
-from pydantic import BaseModel, constr, conint
+from typing import List
 
+from pydantic import BaseModel, constr, conint
 from app.schemas.user import UserResponse
+
 
 class ProviderCreate(BaseModel):
     name: constr(min_length=1, max_length=255)

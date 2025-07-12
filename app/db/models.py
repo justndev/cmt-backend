@@ -12,7 +12,6 @@ campaign_placement_association = Table(
     Column('created_at', DateTime, default=datetime.now)
 )
 
-
 class User(Base):
     __tablename__ = "users"
 
@@ -23,7 +22,6 @@ class User(Base):
 
     campaigns = relationship("Campaign", back_populates="user")
     payouts = relationship("Payout", back_populates="user")
-
 
 class Campaign(Base):
     __tablename__ = "campaigns"
@@ -46,7 +44,6 @@ class Campaign(Base):
 
     payouts = relationship("Payout", back_populates="campaign")
 
-
 class Provider(Base):
     __tablename__ = "providers"
 
@@ -55,7 +52,6 @@ class Provider(Base):
     created_at = Column(DateTime, default=datetime.now)
 
     placements = relationship("Placement", back_populates="provider")
-
 
 class Placement(Base):
     __tablename__ = "placements"
@@ -75,7 +71,6 @@ class Placement(Base):
     )
 
     payouts = relationship("Payout", back_populates="placement")
-
 
 class Payout(Base):
     __tablename__ = "payouts"

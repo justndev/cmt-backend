@@ -1,14 +1,13 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-
 from app.api.routes import auth, cmt
 from app.db.database import engine
 from app.db.models import Base
 
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FastAPI JWT Auth", version="1.0.0")
-
 app.include_router(cmt.router, prefix="/api/cmt", tags=["cmt"])
 app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 

@@ -1,4 +1,5 @@
 # Campaign Management Tool
+www.justndev.xyz <-- Available here
 ## Description
 A Full Stack Campaign Management Tool built with:
 - Backend: FastAPI (Python)
@@ -142,6 +143,27 @@ npm install
 npm run dev
 ```
 ### Backend
+An empty databased required.
+Below is a command to create providers and placements.
+```bash
+INSERT INTO providers (name, created_at) VALUES 
+('Google Ads', NOW()),
+('Facebook Ads', NOW()),
+('Mega Ads', NOW()),
+('YouTube Ads', NOW()),
+('Telegram Ads', NOW());
+
+INSERT INTO placements (country, imp_price_in_eur, provider_id, created_at) VALUES 
+('United States', 750, 1, NOW()),        -- Google Ads, $0.75 equivalent
+('Germany', 650, 1, NOW()),             -- Google Ads, $0.65 equivalent
+('United Kingdom', 700, 2, NOW()),       -- Facebook Ads, $0.70 equivalent
+('France', 600, 2, NOW()),              -- Facebook Ads, $0.60 equivalent
+('Canada', 550, 3, NOW()),              -- Mega Ads, $0.55 equivalent
+('Australia', 800, 3, NOW()),           -- Mega Ads, $0.80 equivalent
+('Japan', 900, 4, NOW()),               -- YouTube Ads, $0.90 equivalent
+('Brazil', 400, 4, NOW()),              -- YouTube Ads, $0.40 equivalent
+('India', 300, 5, NOW());               -- Telegram Ads, $0.30 equivalent
+```
 Set up environmental variables:
 ```
 DATABASE_URL=

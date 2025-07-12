@@ -1,5 +1,6 @@
 from app.services.security import get_password_hash, verify_password, create_access_token, verify_token
 
+
 def test_password_hash_and_verify():
     raw = "s3cr3t"
     hashed = get_password_hash(raw)
