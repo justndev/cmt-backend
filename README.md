@@ -1,5 +1,5 @@
 # Campaign Management Tool
-www.justndev.xyz <-- Available here
+www.github.com/justndev/cmt-frontend <-- Link to frontend
 ## Description
 A Full Stack Campaign Management Tool built with:
 - Backend: FastAPI (Python)
