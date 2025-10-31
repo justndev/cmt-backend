@@ -1,98 +1,113 @@
-def test_create_provider(client):
-    response = client.post("/api/cmt/providers", json={
-        "name": "My Ads"
-    })
-    assert response.status_code == 200
-    data = response.json()
-    assert data["name"] == "My Ads"
+import pytest
+from sqlalchemy.exc import SQLAlchemyError
+from app.db.models.page import Page
+from app.cruds.page_crud import PageCrud
 
-def test_create_placement(client):
-    response = client.post("/api/cmt/placements", json={
-        "country": "Germany",
-        "imp_price_in_eur": 150,
-        "provider_id": 1
-    })
-    assert response.status_code == 200
-    data = response.json()
-    assert data["country"] == "Germany"
-    assert data["imp_price_in_eur"] == 150
 
-def test_create_campaign(client):
-    placement_response = client.get("/api/cmt/placements")
-    assert placement_response.status_code == 200
-    placements = placement_response.json()
-    assert placements
+class TestPageCrud:
+    @pytest.fixture(autouse=True)
+    def setup(self, setup_test_database):
+        self.db = setup_test_database
+        self.page_crud = PageCrud(self.db)
 
-    placement_ids = [placements[0]["id"]]
+        yield
 
-    login_response = client.post("/api/auth/login", json={
-        "username": "testuser1",
-        "password": "testpass123"
-    })
-    token = login_response.json()["access_token"]
+        self.db.close()
 
-    response = client.post("/api/cmt/campaigns", json={
-        "title": "Test Campaign",
-        "url": "http://example.com",
-        "placement_ids": placement_ids
-    }, headers={
-        'Authorization': f'Bearer {token}'
-    })
-    assert response.status_code == 200
-    data = response.json()
-    assert data["title"] == "Test Campaign"
-    assert data["url"] == "http://example.com"
-    assert len(data["placements"]) > 0
+    def test_add_page_success(self):
+        """Test adding a new page successfully"""
+        # Arrange
+        url = "https://example.com"
+        content = "<html>Test Content</html>"
 
-def test_filter_campaigns(client):
-    login_response = client.post("/api/auth/login", json={
-        "username": "testuser1",
-        "password": "testpass123"
-    })
-    token = login_response.json()["access_token"]
+        # Act
+        page = self.page_crud.add_page(url=url, content=content)
 
-    response = client.get("/api/cmt/campaigns/filter?search=Test", headers={
-        'Authorization': f'Bearer {token}'
-    })
+        # Assert
+        assert page is not None
+        assert page.id is not None
+        assert page.url == url
+        assert page.content == content
+        assert page.created_at is not None
 
-    assert response.status_code == 200
-    campaigns = response.json()
-    assert isinstance(campaigns, list)
+    def test_add_page_duplicate_url(self):
+        """Test that adding duplicate URL raises an error"""
+        # Arrange
+        url = "https://example.com"
+        content1 = "<html>Content 1</html>"
+        content2 = "<html>Content 2</html>"
 
-def test_toggle_campaign_status(client):
-    login_response = client.post("/api/auth/login", json={
-        "username": "testuser1",
-        "password": "testpass123"
-    })
-    token = login_response.json()["access_token"]
+        # Act
+        self.page_crud.add_page(url=url, content=content1)
 
-    campaigns = client.get("/api/cmt/campaigns", headers={
-        'Authorization': f'Bearer {token}'
-    }).json()
-    assert campaigns
-    campaign_id = campaigns[0]["id"]
+        # Assert - should raise IntegrityError for duplicate URL
+        with pytest.raises(SQLAlchemyError):
+            self.page_crud.add_page(url=url, content=content2)
 
-    response = client.patch(f"/api/cmt/campaigns/{campaign_id}/status", json={"is_active": False}, headers={
-        'Authorization': f'Bearer {token}'
-    })
-    assert response.status_code == 200
-    assert not response.json()["is_active"]
+    def test_get_all_pages_empty(self):
+        """Test getting all pages when database is empty"""
+        # Act
+        pages = self.page_crud.get_all_pages()
 
-def test_delete_campaign(client):
-    login_response = client.post("/api/auth/login", json={
-        "username": "testuser1",
-        "password": "testpass123"
-    })
-    token = login_response.json()["access_token"]
+        # Assert
+        assert pages == []
+        assert len(pages) == 0
 
-    campaigns = client.get("/api/cmt/campaigns", headers={
-        'Authorization': f'Bearer {token}'
-    }).json()
-    assert campaigns
-    campaign_id = campaigns[0]["id"]
+    def test_get_all_pages_multiple(self):
+        """Test getting all pages with multiple entries"""
+        # Arrange - add multiple pages
+        pages_data = [
+            ("https://example1.com", "<html>Content 1</html>"),
+            ("https://example2.com", "<html>Content 2</html>"),
+            ("https://example3.com", "<html>Content 3</html>"),
+        ]
 
-    response = client.delete("/api/cmt/campaigns", params={"campaign_id": campaign_id}, headers={
-        'Authorization': f'Bearer {token}'
-    })
-    assert response.status_code == 200
-    assert response.json()["is_archived"] is True
+        for url, content in pages_data:
+            self.page_crud.add_page(url=url, content=content)
+
+        # Act
+        pages = self.page_crud.get_all_pages()
+
+        # Assert
+        assert len(pages) == 3
+        assert all(isinstance(page, Page) for page in pages)
+
+        # Verify URLs are correct
+        urls = [page.url for page in pages]
+        assert "https://example1.com" in urls
+        assert "https://example2.com" in urls
+        assert "https://example3.com" in urls
+
+    def test_reset_pages(self):
+        """Test resetting/deleting all pages"""
+        # Arrange - add some pages
+        self.page_crud.add_page("https://example1.com", "<html>Content 1</html>")
+        self.page_crud.add_page("https://example2.com", "<html>Content 2</html>")
+
+        # Verify pages exist
+        assert len(self.page_crud.get_all_pages()) == 2
+
+        # Act
+        self.page_crud.delete_all_pages()
+
+        # Assert
+        pages = self.page_crud.get_all_pages()
+        assert len(pages) == 0
+
+    def test_add_page_empty_url(self):
+        """Test adding page with empty URL"""
+        # Act & Assert
+        with pytest.raises(Exception):
+            self.page_crud.add_page(url="", content="<html>Content</html>")
+
+    def test_add_page_empty_content(self):
+        """Test adding page with empty content - should succeed"""
+        # Arrange
+        url = "https://example.com"
+
+        # Act
+        page = self.page_crud.add_page(url=url, content="")
+
+        # Assert
+        assert page is not None
+        assert page.content == ""

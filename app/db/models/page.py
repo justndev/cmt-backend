@@ -4,6 +4,18 @@ from app.db.database import Base
 
 
 class Page(Base):
+    """
+    Page ORM model that is used to store page information
+    Attributes:
+        id (int): Primary key, auto-incremented unique identifier
+        url (str): Full URL of the crawled page including protocol
+                  (e.g., "https://example.com/about")
+                  Must be unique across all pages
+        content (str): Extracted and cleaned text content from the page
+                      Excludes scripts, styles, and other non-text elements
+        created_at (datetime): Timestamp when the page was stored in the database
+                              Automatically set to current time on creation
+    """
     __tablename__ = "pages"
 
     id = Column(Integer, primary_key=True, index=True)

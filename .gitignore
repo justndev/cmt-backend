@@ -4,47 +4,35 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environment
 venv/
 env/
 .venv/
 
-# Editor settings
 .vscode/
 .idea/
 *.swp
 
-# OS files
 .DS_Store
 Thumbs.db
 
-# Logs and environment
 *.log
 .env
 .env.*
 
-# Python packaging
 build/
 dist/
 *.egg-info/
 
-# Pytest cache
 .pytest_cache/
 
-# Coverage reports
 htmlcov/
 .coverage
 .coverage.*
 
-# Mypy & other tools
 .mypy_cache/
 .dmypy.json
 .pyre/
 
-# Database / migrations (if you create these locally)
 *.sqlite3
 alembic/versions/
-
-# Others
-out/
 
