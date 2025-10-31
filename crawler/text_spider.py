@@ -30,7 +30,8 @@ class TextSpider(scrapy.Spider):
         super().__init__()
 
         self.total_chars = 0
-        self.page_crud = PageCrud(get_db())
+        self.db = next(get_db())
+        self.page_crud = PageCrud(self.db)
         self.page_crud.delete_all_pages()
 
     def parse(self, response):

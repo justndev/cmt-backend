@@ -11,8 +11,10 @@ class AppService:
     """
     Entry point from user request to app functionality. Handles exceptions from lower application layers and process business logic
     """
+
     def __init__(self):
-        self.page_crud = PageCrud(get_db())
+        self.db = next(get_db())
+        self.page_crud = PageCrud(self.db)
         self.validation_service = ValidationService()
         self.openai_service = OpenAIService()
 
